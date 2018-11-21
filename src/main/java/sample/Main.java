@@ -10,10 +10,12 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-        primaryStage.setTitle("Sample UI");
-        primaryStage.setScene(new Scene(root, 320, 245));
+        System.out.println(System.getProperty("user.dir"));
+        Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("anotherOne.fxml"));
+        primaryStage.setTitle("ScanX");
+        primaryStage.setScene(new Scene(root, 900, 600));
         primaryStage.show();
+        primaryStage.setResizable(false);
     }
 
 
