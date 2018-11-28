@@ -45,12 +45,15 @@ public class MainController implements Initializable {
 
    private ObservableList<UploadableFile> fileNamesView = null;
 
+   private void initializeServerBackground() {
+      NodeServer server = new NodeServer();
+      server.deploy();
+   }
+
    @Override
    public void initialize(URL location, ResourceBundle resources) {
-      File f = new File("/Users/ghristovspas/Desktop/commands.txt");
-      UploadableFile file = new UploadableFile(f);
+      initializeServerBackground();
       fileNamesView = FXCollections.observableArrayList();
-      fileNamesView.add(file);
       generateTableColumns();
       tableView.getColumns().addAll(nameCol, locationCol, statusCol);
       printBasicInfo();
@@ -71,7 +74,8 @@ public class MainController implements Initializable {
       System.out.println(f.getArch());
       System.out.println(f.getVers());
       System.out.println(f.getUserName());
-      System.out.println(f.getAddr());
+      System.out.println(f.getRemoteIp());
+      f.generateUsedPortSchema();
    }
 
    @FXML
@@ -145,15 +149,11 @@ public class MainController implements Initializable {
             }
          }
       }
-
    }
 
    private void addFileToView(UploadableFile file){
       fileNamesView.add(file);
       tableView.getItems().add(file);
-      for(UploadableFile f : tableView.getItems()) {
-         System.out.println("Files's name is : " + f.getFile().getName());
-      }
    }
 
    private void removeFileFromView(File file){

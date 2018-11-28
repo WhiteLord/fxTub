@@ -13,6 +13,7 @@ public class UploadableFile {
    private final File _file;
    private final String md5;
    private final String sha256;
+   private final String sha1;
    private boolean isUploaded = false;
    private boolean isChecked = false;
    private boolean _isFileMalicious;
@@ -23,6 +24,7 @@ public class UploadableFile {
       _file = file;
       md5 = getFileHash(file, "md5");
       sha256 = getFileHash(file, "sha256");
+      sha1 = getFileHash(file, "sha1");
       fileName = file.getName();
       fileLocation = file.getAbsolutePath();
    }
@@ -34,6 +36,8 @@ public class UploadableFile {
    public String getSha256() {
       return sha256;
    }
+
+   public String getSha1() { return sha1; }
 
    public File getFile() {
       return _file;
