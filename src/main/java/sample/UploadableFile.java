@@ -16,11 +16,15 @@ public class UploadableFile {
    private boolean isUploaded = false;
    private boolean isChecked = false;
    private boolean _isFileMalicious;
+   private final String fileName;
+   private final String fileLocation;
 
    public UploadableFile(final File file) {
       _file = file;
       md5 = getFileHash(file, "md5");
       sha256 = getFileHash(file, "sha256");
+      fileName = file.getName();
+      fileLocation = file.getAbsolutePath();
    }
 
    public String getMd5() {

@@ -4,7 +4,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
@@ -75,12 +74,11 @@
                         <JFXButton id="removeButton" alignment="CENTER" buttonType="RAISED" nodeOrientation="LEFT_TO_RIGHT" onAction="#removeFileClick" ripplerFill="#e04a4a" text="Remove" ButtonBar.buttonData="LEFT" />
                         <JFXButton id="scanButton" alignment="CENTER" buttonType="RAISED" nodeOrientation="LEFT_TO_RIGHT" onAction="#scanFileClick" ripplerFill="#4a79e0" text="Scan" ButtonBar.buttonData="RIGHT" />
                      </buttons></ButtonBar>
-                  <ListView id="fileNameListView" prefHeight="508.0" prefWidth="221.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
                   <TableView fx:id="tableView" layoutX="-4.0" prefHeight="508.0" prefWidth="898.0">
                     <columns>
-                      <TableColumn fx:id="nameCol" id="nameCol" prefWidth="150.00003051757812" text="File name" />
-                      <TableColumn fx:id="locationCol" id="locationCol" minWidth="0.0" prefWidth="583.0" text="File location" />
-                        <TableColumn fx:id="statusCol" id="statusCol" minWidth="0.0" prefWidth="163.0" text="Status" />
+                      <TableColumn id="nameCol" fx:id="nameCol" prefWidth="150.00003051757812" text="File name" />
+                      <TableColumn id="locationCol" fx:id="locationCol" minWidth="0.0" prefWidth="583.0" text="File location" />
+                        <TableColumn id="statusCol" fx:id="statusCol" minWidth="0.0" prefWidth="163.0" text="Status" />
                     </columns>
                   </TableView>
           </children>

@@ -1,4 +1,4 @@
-package sample;
+package sample.Telemetry;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -24,23 +24,23 @@ public class Feed {
    }
 
    private String getProp(String s) {
-      return System.getProperty(s).toString();
+      return System.getProperty(s);
    }
 
    public String getOs() {
-      return getProp("os.name");
+      return getProp(TelemetryUtil.osName);
    }
 
    public String getVers() {
-      return getProp("os.version");
+      return getProp(TelemetryUtil.osVersion);
    }
 
    public String getArch() {
-      return getProp("os.arch");
+      return getProp(TelemetryUtil.osArch);
    }
 
    public String getUserName() {
-      return getProp("user.name");
+      return getProp(TelemetryUtil.userName);
    }
 
    public String getAddr() {

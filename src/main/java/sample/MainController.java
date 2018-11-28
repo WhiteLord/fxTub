@@ -18,7 +18,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
-
+import sample.Telemetry.Feed;
 
 public class MainController implements Initializable {
 
@@ -29,7 +29,7 @@ public class MainController implements Initializable {
    private final Set<UploadableFile> _localFileCache = new HashSet<>();
 
    @FXML
-   private final TableView<UploadableFile> tableView = new TableView<>();
+   private final TableView<UploadableFile> tableView= new TableView<>();
    @FXML
    private final TableColumn<UploadableFile, String> nameCol = new TableColumn<>();
    @FXML
@@ -43,22 +43,27 @@ public class MainController implements Initializable {
    @FXML
    private final Button scanButton = new Button();
 
-   private final ObservableList<UploadableFile> fileNamesView = FXCollections.observableArrayList();
+   private ObservableList<UploadableFile> fileNamesView = null;
 
    @Override
    public void initialize(URL location, ResourceBundle resources) {
+      File f = new File("/Users/ghristovspas/Desktop/commands.txt");
+      UploadableFile file = new UploadableFile(f);
+      fileNamesView = FXCollections.observableArrayList();
+      fileNamesView.add(file);
+      generateTableColumns();
+      tableView.getColumns().addAll(nameCol, locationCol, statusCol);
       printBasicInfo();
       addButton.setOnAction(this::addFileClick);
       removeButton.setOnAction(this::removeFileClick);
       scanButton.setOnAction(this::scanFileClick);
-      generateTableColumns();
    }
 
    private void generateTableColumns(){
-      tableView.setItems(fileNamesView);
-      nameCol.setCellValueFactory(new PropertyValueFactory<>("File name"));
-      locationCol.setCellValueFactory(new PropertyValueFactory<>("File location"));
+      nameCol.setCellValueFactory(new PropertyValueFactory<>("fileName"));
+      locationCol.setCellValueFactory(new PropertyValueFactory<>("fileLocation"));
       statusCol.setCellValueFactory(new PropertyValueFactory<>("Status"));
+      tableView.setItems(fileNamesView);
    }
 
    private void printBasicInfo() {
@@ -86,17 +91,19 @@ public class MainController implements Initializable {
    @FXML
    private void addFileClick(ActionEvent actionEvent){
       if(hasTimeElapsed()){
-         lastAddFileTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
          FileChooser fileChooser = new FileChooser();
          fileChooser.setTitle("Chose a file to scan");
          File userUploadedFile = fileChooser.showOpenDialog(null);
          if(userUploadedFile != null){
             if(isFileSizeAcceptable(userUploadedFile)){
-               addFileToLocalFileCacheAndView(userUploadedFile);
+               lastAddFileTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
+               UploadableFile file = new UploadableFile(userUploadedFile);
+               addFileToLocalFileCacheAndView(file);
                System.out.println(userUploadedFile.getName());
             }
             else{
                AlertBuilder.createErrorAlert(AlertBuilder.fileSizeTitle,AlertBuilder.fileSizeWarning);
+               addFileClick(actionEvent);
             }
          }
       }
@@ -122,19 +129,31 @@ public class MainController implements Initializable {
       return f.length() < 31457280 ? true : false;
    }
 
-   private void addFileToLocalFileCacheAndView(File file){
-      if(_localFileCache.contains(file)){
-         // Show panel which says that the file is already on the queue for upload
+   private void addFileToLocalFileCacheAndView(UploadableFile file){
+      if(_localFileCache.size() == 0) {
+         _localFileCache.add(file);
+         addFileToView(file);
       }
       else{
-         UploadableFile currentFile = new UploadableFile(file);
-         _localFileCache.add(currentFile);
-         addFileToListView(currentFile);
+         for(UploadableFile cachedFile : _localFileCache) {
+            if(file.getMd5().equals(cachedFile.getMd5())) {
+               AlertBuilder.createInfoAlert(AlertBuilder.duplicateFileTitle, AlertBuilder.duplicateFileText);
+            }
+            else {
+               _localFileCache.add(file);
+               addFileToView(file);
+            }
+         }
       }
+
    }
 
-   private void addFileToListView(UploadableFile file){
-
+   private void addFileToView(UploadableFile file){
+      fileNamesView.add(file);
+      tableView.getItems().add(file);
+      for(UploadableFile f : tableView.getItems()) {
+         System.out.println("Files's name is : " + f.getFile().getName());
+      }
    }
 
    private void removeFileFromView(File file){

@@ -15,6 +15,9 @@ public class AlertBuilder {
    public static final String trialText = "You're using the demo version of the program. If you want to exceed the limitations," +
          "you can buy the full version by contacting " + companyMail + " or by visiting: " + companyWebsite;
 
+   public static final String duplicateFileTitle = "Duplicate file found";
+   public static final String duplicateFileText = "The file is already added to the queue. Please, double-check the added items";
+
    public static void createErrorAlert(String title, String information) {
       Alert alert = new Alert(Alert.AlertType.ERROR);
       alert.setTitle(title);
@@ -24,6 +27,13 @@ public class AlertBuilder {
 
    public static void createWarningAlert(String title, String information) {
       Alert alert = new Alert(Alert.AlertType.WARNING);
+      alert.setTitle(title);
+      alert.setContentText(information);
+      alert.showAndWait();
+   }
+
+   public static void createInfoAlert(String title, String information) {
+      Alert alert = new Alert(Alert.AlertType.INFORMATION);
       alert.setTitle(title);
       alert.setContentText(information);
       alert.showAndWait();
