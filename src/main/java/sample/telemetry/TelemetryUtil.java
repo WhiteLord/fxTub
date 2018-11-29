@@ -1,4 +1,4 @@
-package sample.Telemetry;
+package sample.telemetry;
 
 public class TelemetryUtil {
    public static final String osName = "os.name";

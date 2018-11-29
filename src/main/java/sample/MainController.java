@@ -2,13 +2,18 @@ package sample;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.SystemUtils;
+
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -18,32 +23,39 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
-import sample.Telemetry.Feed;
+import sample.dao.DisplayableTableInfo;
+import sample.dao.UploadableFile;
+import sample.telemetry.Feed;
 
 public class MainController implements Initializable {
 
    private long lastAddFileTime = 0;
    private final Feed f = Feed.getFeedInstance();
 
-   // File cache we use to keep the uploaded files and run initial checks
+   /**
+    * File cache that we use to keep the transformed files, uploaded by the user
+    */
    private final Set<UploadableFile> _localFileCache = new HashSet<>();
 
+   private final List<DisplayableTableInfo> displayableTableInfos = new ArrayList<>();
+
+   private ObservableList<DisplayableTableInfo> fileNamesView =
+         FXCollections.observableArrayList(displayableTableInfos);
+
    @FXML
-   private final TableView<UploadableFile> tableView= new TableView<>();
+   private final TableView<DisplayableTableInfo> tableView= new TableView<>();
    @FXML
-   private final TableColumn<UploadableFile, String> nameCol = new TableColumn<>();
+   private final TableColumn<DisplayableTableInfo, String> nameCol = new TableColumn<>();
    @FXML
-   private final TableColumn<UploadableFile, String>locationCol = new TableColumn<>();
+   private final TableColumn<DisplayableTableInfo, String> locationCol = new TableColumn<>();
    @FXML
-   private final TableColumn<UploadableFile, String>statusCol = new TableColumn<>();
+   private final TableColumn<DisplayableTableInfo, String> statusCol = new TableColumn<>();
    @FXML
    private final Button addButton = new Button();
    @FXML
    private final Button removeButton = new Button();
    @FXML
-   private final Button scanButton = new Button();
-
-   private ObservableList<UploadableFile> fileNamesView = null;
+   private Button scanButton = new Button();
 
    private void initializeServerBackground() {
       NodeServer server = new NodeServer();
@@ -53,10 +65,14 @@ public class MainController implements Initializable {
    @Override
    public void initialize(URL location, ResourceBundle resources) {
       initializeServerBackground();
-      fileNamesView = FXCollections.observableArrayList();
       generateTableColumns();
-      tableView.getColumns().addAll(nameCol, locationCol, statusCol);
       printBasicInfo();
+      fileNamesView.addListener(new ListChangeListener<DisplayableTableInfo>() {
+         @Override
+         public void onChanged(Change<? extends DisplayableTableInfo> c) {
+            System.out.println("Change!");
+         }
+      });
       addButton.setOnAction(this::addFileClick);
       removeButton.setOnAction(this::removeFileClick);
       scanButton.setOnAction(this::scanFileClick);
@@ -65,8 +81,10 @@ public class MainController implements Initializable {
    private void generateTableColumns(){
       nameCol.setCellValueFactory(new PropertyValueFactory<>("fileName"));
       locationCol.setCellValueFactory(new PropertyValueFactory<>("fileLocation"));
-      statusCol.setCellValueFactory(new PropertyValueFactory<>("Status"));
-      tableView.setItems(fileNamesView);
+      statusCol.setCellValueFactory(new PropertyValueFactory<>("isMalicious"));
+      tableView.getColumns().add(nameCol);
+      tableView.getColumns().add(locationCol);
+      tableView.getColumns().add(statusCol);
    }
 
    private void printBasicInfo() {
@@ -133,27 +151,40 @@ public class MainController implements Initializable {
       return f.length() < 31457280 ? true : false;
    }
 
-   private void addFileToLocalFileCacheAndView(UploadableFile file){
+   /**
+    * The method should:
+    * 1. Set the uploadableFile in the local cache set
+    * 2. Create DisplayableTableInfo object from the file
+    * 3. Populate the view with information from displayableTableInfo object
+    * @param uploadableFile the File that the user has uploaded
+    */
+   private void addFileToLocalFileCacheAndView(UploadableFile uploadableFile){
       if(_localFileCache.size() == 0) {
-         _localFileCache.add(file);
-         addFileToView(file);
+         _localFileCache.add(uploadableFile);
+         addFileToView(uploadableFile);
       }
       else{
          for(UploadableFile cachedFile : _localFileCache) {
-            if(file.getMd5().equals(cachedFile.getMd5())) {
+            if(uploadableFile.getMd5().equals(cachedFile.getMd5())) {
                AlertBuilder.createInfoAlert(AlertBuilder.duplicateFileTitle, AlertBuilder.duplicateFileText);
             }
             else {
-               _localFileCache.add(file);
-               addFileToView(file);
+               _localFileCache.add(uploadableFile);
+               addFileToView(uploadableFile);
             }
          }
       }
    }
 
-   private void addFileToView(UploadableFile file){
-      fileNamesView.add(file);
-      tableView.getItems().add(file);
+   private void addFileToView(UploadableFile uploadableFile) {
+      DisplayableTableInfo displayableTableInfo = new DisplayableTableInfo(
+            uploadableFile.getFile().getName(),
+            uploadableFile.getFile().getAbsolutePath(),
+            "Uploading...");
+      displayableTableInfos.add(displayableTableInfo);
+      fileNamesView.add(displayableTableInfo);
+      tableView.setItems(fileNamesView);
+      tableView.getColumns().addAll(nameCol, locationCol, statusCol);
    }
 
    private void removeFileFromView(File file){

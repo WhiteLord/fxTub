@@ -1,4 +1,4 @@
-package sample.Telemetry.browser;
+package sample.telemetry.browser;
 
 import java.util.Map;
 

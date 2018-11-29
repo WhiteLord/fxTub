@@ -1,10 +1,10 @@
-package sample.Telemetry.browser;
+package sample.telemetry.browser;
 
 import java.util.Map;
 
-public class ChromeBrowser extends GenericBrowser implements BrowserInfo {
+public class OperaBrowser extends GenericBrowser implements BrowserInfo{
 
-   private final String name = "Chrome";
+   private final String name = "Opera";
 
    @Override
    public String getName() {

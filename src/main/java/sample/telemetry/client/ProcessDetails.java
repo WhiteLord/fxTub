@@ -1,4 +1,4 @@
-package sample.Telemetry.client;
+package sample.telemetry.client;
 
 /**
  * Holds pieces of information, which can be observed if changed.

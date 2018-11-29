@@ -1,0 +1,28 @@
+#addButton {
+    -fx-background-color: #C8E6C9;
+}
+
+#addButton:hover {
+    -fx-background-color: #81C784;
+}
+
+#removeButton {
+    -fx-background-color: #FFCDD2;
+}
+
+#removeButton:hover {
+    -fx-background-color: #E57373;
+}
+
+#scanButton {
+    -fx-background-color: #B3E5FC;
+}
+
+#scanButton:hover {
+    -fx-background-color: #4FC3F7;
+}
+
+
+
+
+

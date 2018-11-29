@@ -1,7 +1,7 @@
-package sample.Telemetry;
+package sample.telemetry;
 
 import org.apache.commons.lang3.SystemUtils;
-import sample.Telemetry.client.ProcessDetails;
+import sample.telemetry.client.ProcessDetails;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -131,7 +131,7 @@ public class Feed {
                   s = new Socket();
                   s.connect(new InetSocketAddress("localhost", port), 1);
                   s.close();
-                  ProcessDetails processDetails = null;
+                  ProcessDetails processDetails = new ProcessDetails();
                   if(SystemUtils.IS_OS_LINUX || SystemUtils.IS_OS_MAC_OSX) {
                      Process p = Runtime.getRuntime().exec("lsof -i :" + port + " | awk '{print $1}'");
                      BufferedReader readr = new BufferedReader(new InputStreamReader(p.getInputStream()));

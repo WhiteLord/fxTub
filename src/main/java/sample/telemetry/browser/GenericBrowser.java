@@ -1,7 +1,7 @@
-package sample.Telemetry.browser;
+package sample.telemetry.browser;
 
 import org.apache.commons.lang3.SystemUtils;
-import sample.Telemetry.Feed;
+import sample.telemetry.Feed;
 
 public abstract class GenericBrowser {
 
@@ -26,24 +26,8 @@ public abstract class GenericBrowser {
     */
    public String getBrowserProfileLocation(BrowserInfo browserType) {
       String location = "";
-      if(SystemUtils.IS_OS_WINDOWS_XP) {
-         String browserName = browserType.getName();
-         switch (browserName) {
-            case "Firefox" :
-               location = "";
-               break;
-            case "Chrome":
-               location = "";
-               break;
-            case "Opera":
-               location = "";
-               break;
-            default:
-               location = "";
-         }
-      }
 
-      else if(SystemUtils.IS_OS_WINDOWS_7 || SystemUtils.IS_OS_WINDOWS_8 || SystemUtils.IS_OS_WINDOWS_10) {
+      if(SystemUtils.IS_OS_WINDOWS_7 || SystemUtils.IS_OS_WINDOWS_8 || SystemUtils.IS_OS_WINDOWS_10) {
          String browserName = browserType.getName();
          switch (browserName) {
             case "Firefox" :
