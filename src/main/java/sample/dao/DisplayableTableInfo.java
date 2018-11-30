@@ -7,12 +7,14 @@ public class DisplayableTableInfo {
    private SimpleStringProperty fileName;
    private SimpleStringProperty fileLocation;
    private SimpleStringProperty isMalicious;
+   private SimpleStringProperty md5;
 
    public DisplayableTableInfo(){}
 
-   public DisplayableTableInfo(String name, String location, String isMalic){
+   public DisplayableTableInfo(String name, String location, String md5Str, String isMalic){
       fileName = new SimpleStringProperty(name);
       fileLocation = new SimpleStringProperty(location);
+      md5 = new SimpleStringProperty(md5Str);
       isMalicious = new SimpleStringProperty("Processing...");
    }
 
@@ -32,7 +34,15 @@ public class DisplayableTableInfo {
       return fileLocation.get();
    }
 
-   public SimpleStringProperty fileLocationProperty() {
+    public String getMd5() {
+        return md5.get();
+    }
+
+    public SimpleStringProperty md5Property() {
+        return md5;
+    }
+
+    public SimpleStringProperty fileLocationProperty() {
       return fileLocation;
    }
 

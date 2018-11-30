@@ -19,6 +19,12 @@ public class AlertBuilder {
    public static final String duplicateFileTitle = "Duplicate file found";
    public static final String duplicateFileText = "The file is already added to the queue. Please, double-check the added items";
 
+   public static final String fileNotFoundTitle = "File not found";
+   public static final String fileNotFoundText = "The file was not found in the directory you've listed. Make sure it exists!";
+
+   public static final String tamperedFileTitle = "File mismatch";
+   public static final String tamperedFileText = "The file that you wish to check is modified. If you have not done anything to it, upload it once more.";
+
    public static void createErrorAlert(String title, String information) {
       Alert alert = new Alert(Alert.AlertType.ERROR);
       alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);

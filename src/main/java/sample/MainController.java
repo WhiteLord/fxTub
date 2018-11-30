@@ -9,16 +9,14 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.SystemUtils;
-
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -43,19 +41,21 @@ public class MainController implements Initializable {
          FXCollections.observableArrayList(displayableTableInfos);
 
    @FXML
-   private final TableView<DisplayableTableInfo> tableView= new TableView<>();
+   TableView<DisplayableTableInfo> tableView;
    @FXML
-   private final TableColumn<DisplayableTableInfo, String> nameCol = new TableColumn<>();
+   TableColumn<DisplayableTableInfo, String> nameCol;
    @FXML
-   private final TableColumn<DisplayableTableInfo, String> locationCol = new TableColumn<>();
+   TableColumn<DisplayableTableInfo, String> locationCol;
    @FXML
-   private final TableColumn<DisplayableTableInfo, String> statusCol = new TableColumn<>();
+   TableColumn<DisplayableTableInfo, String> statusCol;
    @FXML
-   private final Button addButton = new Button();
+   TableColumn<DisplayableTableInfo, String> md5Col;
    @FXML
-   private final Button removeButton = new Button();
+   Button addButton;
    @FXML
-   private Button scanButton = new Button();
+   Button removeButton;
+   @FXML
+   Button scanButton;
 
    private void initializeServerBackground() {
       NodeServer server = new NodeServer();
@@ -67,24 +67,13 @@ public class MainController implements Initializable {
       initializeServerBackground();
       generateTableColumns();
       printBasicInfo();
-      fileNamesView.addListener(new ListChangeListener<DisplayableTableInfo>() {
-         @Override
-         public void onChanged(Change<? extends DisplayableTableInfo> c) {
-            System.out.println("Change!");
-         }
-      });
-      addButton.setOnAction(this::addFileClick);
-      removeButton.setOnAction(this::removeFileClick);
-      scanButton.setOnAction(this::scanFileClick);
    }
 
    private void generateTableColumns(){
       nameCol.setCellValueFactory(new PropertyValueFactory<>("fileName"));
       locationCol.setCellValueFactory(new PropertyValueFactory<>("fileLocation"));
       statusCol.setCellValueFactory(new PropertyValueFactory<>("isMalicious"));
-      tableView.getColumns().add(nameCol);
-      tableView.getColumns().add(locationCol);
-      tableView.getColumns().add(statusCol);
+      md5Col.setCellValueFactory(new PropertyValueFactory<>("md5"));
    }
 
    private void printBasicInfo() {
@@ -98,7 +87,27 @@ public class MainController implements Initializable {
 
    @FXML
    private void scanFileClick(ActionEvent actionEvent) {
-   }
+      //if(hasDemoTimeElapsed()) {
+         DisplayableTableInfo displayableTableInfo = tableView.getSelectionModel().getSelectedItem();
+         String fileLocation = displayableTableInfo.getFileLocation();
+         if(checkIfFileExistsInDir(fileLocation)) {
+            for(UploadableFile uploadableFile : _localFileCache) {
+               if(uploadableFile.getFile().getAbsolutePath().equals(fileLocation)) {
+                  // interact with the api via the hash
+                  lastAddFileTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
+               }
+               else {
+                  AlertBuilder.createWarningAlert(AlertBuilder.tamperedFileTitle, AlertBuilder.tamperedFileText);
+                  continue;
+               }
+            }
+         }
+         }
+
+    //  else {
+    //     AlertBuilder.createWarningAlert(AlertBuilder.trialTitle, AlertBuilder.trialText);
+    //  }
+  // }
 
    @FXML
    private void quitApplication(ActionEvent actionEvent) {
@@ -106,29 +115,30 @@ public class MainController implements Initializable {
       Platform.exit();
    }
 
+   /**
+    * Removes the file from view, but keeps it intact in the set for future checks.
+    */
    @FXML
    private void removeFileClick(ActionEvent actionEvent) {
+      DisplayableTableInfo tableInfo = tableView.getSelectionModel().getSelectedItem();
+      tableView.getItems().remove(tableInfo);
    }
 
    @FXML
    private void addFileClick(ActionEvent actionEvent){
-      if(hasTimeElapsed()){
          FileChooser fileChooser = new FileChooser();
          fileChooser.setTitle("Chose a file to scan");
          File userUploadedFile = fileChooser.showOpenDialog(null);
          if(userUploadedFile != null){
             if(isFileSizeAcceptable(userUploadedFile)){
-               lastAddFileTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
                UploadableFile file = new UploadableFile(userUploadedFile);
                addFileToLocalFileCacheAndView(file);
-               System.out.println(userUploadedFile.getName());
             }
             else{
                AlertBuilder.createErrorAlert(AlertBuilder.fileSizeTitle,AlertBuilder.fileSizeWarning);
                addFileClick(actionEvent);
             }
          }
-      }
       else {
          AlertBuilder.createWarningAlert(AlertBuilder.trialTitle, AlertBuilder.trialText);
       }
@@ -137,9 +147,9 @@ public class MainController implements Initializable {
    /**
     * If the program has initialized for the first time (even if closed and reopened). Else,
     * the user needs to wait for 60 seconds to add file again
-    * @return
+    * @return true if 60 seconds have passed since the las call
     */
-   private boolean hasTimeElapsed() {
+   private boolean hasDemoTimeElapsed() {
       if(lastAddFileTime == 0){
          return true;
       }
@@ -147,6 +157,11 @@ public class MainController implements Initializable {
       return lastAddFileTime + 60 >= currTime? false : true;
    }
 
+   /**
+    * Checks whether the file size is gt 30Mb.
+    * @param f uploaded file
+    * @return true if the size is lt 30 Mb
+    */
    private boolean isFileSizeAcceptable(File f){
       return f.length() < 31457280 ? true : false;
    }
@@ -167,6 +182,7 @@ public class MainController implements Initializable {
          for(UploadableFile cachedFile : _localFileCache) {
             if(uploadableFile.getMd5().equals(cachedFile.getMd5())) {
                AlertBuilder.createInfoAlert(AlertBuilder.duplicateFileTitle, AlertBuilder.duplicateFileText);
+               break;
             }
             else {
                _localFileCache.add(uploadableFile);
@@ -180,16 +196,39 @@ public class MainController implements Initializable {
       DisplayableTableInfo displayableTableInfo = new DisplayableTableInfo(
             uploadableFile.getFile().getName(),
             uploadableFile.getFile().getAbsolutePath(),
+            uploadableFile.getMd5(),   
             "Uploading...");
       displayableTableInfos.add(displayableTableInfo);
       fileNamesView.add(displayableTableInfo);
       tableView.setItems(fileNamesView);
-      tableView.getColumns().addAll(nameCol, locationCol, statusCol);
    }
 
-   private void removeFileFromView(File file){
-      // Removes the file from view. Keep is in local cache.
+   /**
+    * Checks if a certain absolute path contains the target file, and runs checks to verify the contents of the file
+    * @param filePath the Absoulte filepath - meaning file included
+    * @return true if a file exists and was not tampered with, false otherways
+    */
+   private boolean checkIfFileExistsInDir(String filePath) {
+      File f = new File(filePath);
+      if(f.exists()) {
+         UploadableFile tempFile = new UploadableFile(f);
+         for(UploadableFile file : _localFileCache) {
+            if(!tempFile.getSha256().equals(file.getSha256())) {
+               AlertBuilder.createWarningAlert(AlertBuilder.tamperedFileTitle, AlertBuilder.tamperedFileText);
+            }
+            else {
+               return true;
+            }
+            return false;
+         }
+      }
+      else
+         AlertBuilder.createErrorAlert(AlertBuilder.fileNotFoundTitle, AlertBuilder.fileNotFoundText);
+      return false;
    }
+
+
+
 /*
    @FXML
    private void addFileClick(ActionEvent actionEvent) {

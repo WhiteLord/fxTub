@@ -18,7 +18,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.MainController">
+<VBox prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.MainController">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -79,9 +79,10 @@
                      </buttons></ButtonBar>
                   <TableView fx:id="tableView" layoutX="-4.0" prefHeight="508.0" prefWidth="898.0">
                     <columns>
-                      <TableColumn id="nameCol" fx:id="nameCol" prefWidth="150.00003051757812" text="File name" />
-                      <TableColumn id="locationCol" fx:id="locationCol" minWidth="0.0" prefWidth="583.0" text="File location" />
-                        <TableColumn id="statusCol" fx:id="statusCol" minWidth="0.0" prefWidth="163.0" text="Status" />
+                      <TableColumn id="nameCol" fx:id="nameCol" minWidth="10.0" prefWidth="150.0" text="File name" />
+                      <TableColumn id="locationCol" fx:id="locationCol" minWidth="10.0" prefWidth="262.0" text="File location" />
+                      <TableColumn id="md5Col" fx:id="md5Col" minWidth="10.0" prefWidth="325.0" text="MD5" />
+                      <TableColumn id="statusCol" fx:id="statusCol" minWidth="10.0" prefWidth="156.0" text="Status" />
                     </columns>
                   </TableView>
           </children>
