@@ -5,6 +5,8 @@ import java.util.Map;
 public class OperaBrowser extends GenericBrowser implements BrowserInfo{
 
    private final String name = "Opera";
+   private final String replacedPath = super.getBrowserProfileLocation(this).
+         replaceAll(" ","\\ ");
 
    @Override
    public String getName() {
@@ -12,7 +14,6 @@ public class OperaBrowser extends GenericBrowser implements BrowserInfo{
    }
 
    @Override
-   public Map<String, String> getUserBrowserInformation() {
-      return null;
+   public void getUserBrowserInformation() {
    }
 }

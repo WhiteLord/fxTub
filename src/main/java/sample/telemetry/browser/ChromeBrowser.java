@@ -5,6 +5,8 @@ import java.util.Map;
 public class ChromeBrowser extends GenericBrowser implements BrowserInfo {
 
    private final String name = "Chrome";
+   private final String replacedPath = super.getBrowserProfileLocation(this).
+         replaceAll(" ","\\ ");
 
    @Override
    public String getName() {
@@ -12,7 +14,6 @@ public class ChromeBrowser extends GenericBrowser implements BrowserInfo {
    }
 
    @Override
-   public Map<String, String> getUserBrowserInformation() {
-      return null;
+   public void getUserBrowserInformation() {
    }
 }
